@@ -44,32 +44,32 @@ static struct country_code_to_enum_rd allCountries[] = {
 /* 2G chan 12 - chan 13, PASSIV SCAN */
 #define RTW_2GHZ_CH12_13	\
 	REG_RULE(2467-10, 2472+10, 40, 0, 20,	\
-		 NL80211_RRF_PASSIVE_SCAN)
+		 0)
 
 /* 2G chan 14, PASSIVS SCAN, NO OFDM (B only) */
 #define RTW_2GHZ_CH14	\
 	REG_RULE(2484-10, 2484+10, 40, 0, 20,	\
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_OFDM)
+		 0)
 
 /* 5G chan 36 - chan 64 */
 #define RTW_5GHZ_5150_5350	\
 	REG_RULE(5150-10, 5350+10, 40, 0, 30,	\
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+		 0)
 
 /* 5G chan 100 - chan 165 */
 #define RTW_5GHZ_5470_5850	\
 	REG_RULE(5470-10, 5850+10, 40, 0, 30, \
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+		 0)
 
 /* 5G chan 149 - chan 165 */
 #define RTW_5GHZ_5725_5850	\
 	REG_RULE(5725-10, 5850+10, 40, 0, 30, \
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+		 0)
 
 /* 5G chan 36 - chan 165 */
 #define RTW_5GHZ_5150_5850	\
 	REG_RULE(5150-10, 5850+10, 40, 0, 30,	\
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+		 0)
 
 static const struct ieee80211_regdomain rtw_regdom_rd = {
 	.n_reg_rules = 3,
@@ -274,7 +274,7 @@ void rtw_regd_apply_flags(struct wiphy *wiphy)
 				ch = &sband->channels[j];
 
 				if (ch)
-					ch->flags = IEEE80211_CHAN_DISABLED;
+					ch->flags &= ~ IEEE80211_CHAN_DISABLED;
 			}
 		}
 	}
@@ -294,9 +294,9 @@ void rtw_regd_apply_flags(struct wiphy *wiphy)
 			#endif
 		) {
 			#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
-			ch->flags = (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
+			ch->flags &= ~ (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
 			#else
-			ch->flags = IEEE80211_CHAN_NO_IR;
+			ch->flags &= ~ IEEE80211_CHAN_NO_IR;
 			#endif
 		} else
 			ch->flags = 0;
@@ -307,11 +307,11 @@ void rtw_regd_apply_flags(struct wiphy *wiphy)
 			&& rtw_odm_dfs_domain_unknown(dvobj)
 			#endif
 		) {
-			ch->flags |= IEEE80211_CHAN_RADAR;
+			ch->flags &= ~ IEEE80211_CHAN_RADAR;
 			#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
-			ch->flags |= (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
+			ch->flags &= ~ (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
 			#else
-			ch->flags |= IEEE80211_CHAN_NO_IR;
+			ch->flags &= ~ IEEE80211_CHAN_NO_IR;
 			#endif
 		}
 		#endif /* CONFIG_DFS */
