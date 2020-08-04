@@ -2292,6 +2292,9 @@ static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
 	struct wifidirect_info *pwdinfo = &(padapter->wdinfo);
 	u8 is_p2p = _FALSE;
 #endif
+//#ifdef CONFIG_MONITOR_MODE_XMIT
+	struct mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
+//#endif
 	int ret = 0;
 	u8 change = _FALSE;
 
@@ -2422,7 +2425,10 @@ static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
 	}
 
 	rtw_setopmode_cmd(padapter, networkType, RTW_CMDF_WAIT_ACK);
-
+//#ifdef CONFIG_MONITOR_MODE_XMIT
+	if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE) == _TRUE)
+		rtw_indicate_connect(padapter);
+//#endif
 exit:
 
 	RTW_INFO(FUNC_NDEV_FMT" ret:%d\n", FUNC_NDEV_ARG(ndev), ret);
